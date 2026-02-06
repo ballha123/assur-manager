@@ -10,7 +10,6 @@ export default function DashboardHeader() {
         <p className="text-slate-500 mt-1">Tableau de bord de gestion</p>
       </div>
 
-      {/* Ce bouton pourrait ouvrir une Modal plus tard */}
       <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-semibold shadow-lg shadow-blue-200 transition-all">
         + Nouveau Client
       </button>

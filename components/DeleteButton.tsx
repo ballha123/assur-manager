@@ -1,11 +1,11 @@
-"use client"; // Obligatoire pour le onClick
+"use client";
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 interface Props {
   id: number;
-  type: "client" | "contrat" | "sinistre"; // Pour savoir quelle API appeler
+  type: "client" | "contrat" | "sinistre";
 }
 
 export default function DeleteButton({ id, type }: Props) {
@@ -13,21 +13,17 @@ export default function DeleteButton({ id, type }: Props) {
   const [loading, setLoading] = useState(false);
 
   const handleDelete = async () => {
-    // 1. Confirmation
     if (!confirm("Êtes-vous sûr de vouloir supprimer cet élément ?")) return;
 
     setLoading(true);
 
     try {
-      // 2. Appel de l'API DELETE
       const res = await fetch(`/api/${type}/${id}`, {
         method: "DELETE",
       });
 
       if (res.ok) {
-        // 3. Rafraîchissement
         router.refresh();
-        // Optionnel : router.push('/') si tu veux revenir à l'accueil après suppression
       } else {
         alert("Erreur lors de la suppression.");
       }

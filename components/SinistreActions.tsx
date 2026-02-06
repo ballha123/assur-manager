@@ -12,12 +12,11 @@ export default function SinistreActions({ id }: { id: number }) {
     setLoading(true);
 
     try {
-      // On appelle l'API PATCH que tu as créée avant
       await fetch(`/api/sinistre/${id}`, {
         method: "PATCH",
         body: JSON.stringify({ statut: nouveauStatut }),
       });
-      router.refresh(); // Met à jour la liste sans recharger la page
+      router.refresh();
     } catch (e) {
       alert("Erreur");
     } finally {

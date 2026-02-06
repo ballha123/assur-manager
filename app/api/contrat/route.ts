@@ -6,7 +6,6 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { police, type, tarif, clientId } = body;
 
-    // 1. Validation des champs
     if (!police || !type || !tarif || !clientId) {
       return NextResponse.json(
         { error: "Tous les champs sont obligatoires." },
@@ -14,7 +13,6 @@ export async function POST(req: Request) {
       );
     }
 
-    // 2. Insertion dans la BDD
     const stmt = db.prepare(
       "INSERT INTO Contrat (police, type, tarif, clientId) VALUES (?, ?, ?, ?)",
     );
@@ -25,7 +23,6 @@ export async function POST(req: Request) {
   } catch (error: any) {
     console.error("Erreur API Contrat:", error);
 
-    // Gestion spécifique si le numéro de police existe déjà (UNIQUE constraint)
     if (error.code === "SQLITE_CONSTRAINT_UNIQUE") {
       return NextResponse.json(
         { error: "Ce numéro de police existe déjà." },

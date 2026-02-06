@@ -1,4 +1,4 @@
-"use client"; // Obligatoire car un graphique utilise le navigateur (SVG/Canvas)
+"use client";
 
 import {
   BarChart,
@@ -10,10 +10,9 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-// On définit le format des données qu'on attend du SQL
 interface ChartData {
-  name: string; // Ex: "Automobile"
-  total: number; // Ex: 12500
+  name: string;
+  total: number;
 }
 
 interface Props {
@@ -21,7 +20,6 @@ interface Props {
 }
 
 export default function RevenueChart({ data }: Props) {
-  // Si pas de données, on affiche un message propre
   if (data.length === 0) {
     return (
       <p className="text-slate-400 text-sm text-center py-10">
@@ -54,7 +52,7 @@ export default function RevenueChart({ data }: Props) {
             tick={{ fill: "#64748b", fontSize: 12 }}
             axisLine={false}
             tickLine={false}
-            unit="€"
+            unit="DT"
           />
 
           <Tooltip

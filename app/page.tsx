@@ -1,4 +1,5 @@
 import AddClientButton from "@/components/AddClientButton";
+import LogoutButton from "@/components/LogoutButton";
 import RevenueChart from "@/components/RevenueChart";
 import SearchBar from "@/components/SearchBar";
 import db from "@/src/lib/db";
@@ -39,7 +40,6 @@ GROUP BY type`,
     )
     .all(searchTerm, searchTerm);
 
-  // B. On calcule les chiffres clés pour le haut de page
   const stats = {
     clients: db.prepare("SELECT COUNT(*) as count FROM Client").get() as {
       count: number;
@@ -51,27 +51,29 @@ GROUP BY type`,
       count: number;
     },
   };
-
-  // 2. AFFICHAGE (Le Rendu)
   return (
     <main className="min-h-screen bg-slate-50 p-8 font-sans">
-      <div className="max-w-md mb-6">
+      <div className="max-w-md mx-auto mb-6">
         <SearchBar />
       </div>
-      {/* --- EN-TÊTE --- */}
+
+      <div className="absolute top-4 right-4">
+        <LogoutButton />
+      </div>
+
       <header className="flex justify-between items-center mb-10">
-        <div>
+        <div className="absolute top-4 left">
           <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
             AssurManager <span className="text-blue-600">Pro</span>
           </h1>
           <p className="text-slate-500 mt-1">Tableau de bord de gestion</p>
         </div>
-        <AddClientButton />
+        <div className=" ml-auto">
+          <AddClientButton />
+        </div>
       </header>
 
-      {/* --- STATISTIQUES (Les Cartes du haut) --- */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-        {/* Carte Clients */}
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col">
           <span className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">
             Portefeuille Clients
@@ -81,7 +83,6 @@ GROUP BY type`,
           </span>
         </div>
 
-        {/* Carte Contrats */}
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col">
           <span className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">
             Contrats Actifs
@@ -91,7 +92,6 @@ GROUP BY type`,
           </span>
         </div>
 
-        {/* Carte Sinistres */}
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col">
           <span className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">
             Sinistres en cours
@@ -104,8 +104,6 @@ GROUP BY type`,
       <section className="mb-10">
         <RevenueChart data={data} />
       </section>
-
-      {/* --- LISTE DES CLIENTS --- */}
       <section>
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-bold text-slate-800">Derniers Clients</h2>
@@ -118,7 +116,7 @@ GROUP BY type`,
           {clients.map((client: any) => (
             <Link
               key={client.id}
-              href={`/client/${client.id}`} // Lien vers la page détail (étape suivante)
+              href={`/client/${client.id}`}
               className="group block bg-white p-6 rounded-2xl border border-slate-200 hover:border-blue-500 hover:shadow-md transition-all duration-200"
             >
               <div className="flex justify-between items-start mb-4">

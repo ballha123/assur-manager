@@ -3,7 +3,6 @@ const db = new Database("assurance.db");
 
 console.log("🏗️  Construction de la base de données...");
 
-// 1. Création des Tables
 db.exec(`
   -- Table CLIENT
   CREATE TABLE IF NOT EXISTS Client (
@@ -11,6 +10,12 @@ db.exec(`
     nom TEXT NOT NULL,
     email TEXT UNIQUE,
     telephone TEXT
+  );
+    -- Table User
+  CREATE TABLE IF NOT EXISTS User (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    email TEXT UNIQUE,
+    password TEXT NOT NULL
   );
 
   -- Table CONTRAT (Liée à Client)
@@ -34,10 +39,8 @@ db.exec(`
   );
 `);
 
-// 2. Nettoyage (Pour repartir à zéro si on relance le script)
 db.exec("DELETE FROM Sinistre; DELETE FROM Contrat; DELETE FROM Client;");
 
-// 3. Insertion de données de test (Seeding)
 const insertClient = db.prepare(
   "INSERT INTO Client (nom, email, telephone) VALUES (?, ?, ?)",
 );
@@ -48,7 +51,6 @@ const insertSinistre = db.prepare(
   "INSERT INTO Sinistre (description, dateDeclaration, statut, contratId) VALUES (?, ?, ?, ?)",
 );
 
-// Création de 2 Clients
 const infoClient1 = insertClient.run("Hedi Dev", "hedi@test.com", "22 333 444");
 const infoClient2 = insertClient.run(
   "Sami Garagiste",
@@ -56,11 +58,9 @@ const infoClient2 = insertClient.run(
   "99 888 777",
 );
 
-// Création de Contrats pour Hedi (ID 1)
 insertContrat.run("AUTO-001", "Automobile", 120, infoClient1.lastInsertRowid);
 insertContrat.run("HAB-002", "Habitation", 50, infoClient1.lastInsertRowid);
 
-// Création de Contrat pour Sami (ID 2)
 const contratSami = insertContrat.run(
   "PRO-999",
   "Professionnel",
@@ -68,7 +68,6 @@ const contratSami = insertContrat.run(
   infoClient2.lastInsertRowid,
 );
 
-// Création d'un Sinistre pour Sami
 insertSinistre.run(
   "Dégât des eaux au garage",
   "2024-02-04",
@@ -76,4 +75,4 @@ insertSinistre.run(
   contratSami.lastInsertRowid,
 );
 
-console.log("✅ Base de données 'assurance.db' prête avec succès !");
+console.log(" 'assurance.db' prête avec succès !");

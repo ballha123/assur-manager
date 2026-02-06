@@ -34,7 +34,6 @@ export default async function DetailClient({
 }) {
   const { id } = await params;
 
-  // 1. REQUÊTE CLIENT
   const client = db
     .prepare("SELECT * FROM Client WHERE id = ?")
     .get(id) as Client;
@@ -50,12 +49,10 @@ export default async function DetailClient({
     );
   }
 
-  // 2. REQUÊTE CONTRATS
   const contrats = db
     .prepare("SELECT * FROM Contrat WHERE clientId = ?")
     .all(id) as Contrat[];
 
-  // 3. REQUÊTE SINISTRES
   const sinistres = db
     .prepare(
       `
@@ -69,7 +66,6 @@ export default async function DetailClient({
 
   return (
     <main className="min-h-screen bg-slate-50 p-8 font-sans">
-      {/* --- EN-TÊTE --- */}{" "}
       <Link
         href="/"
         className="text-slate-500 hover:text-slate-800 font-medium"
@@ -107,7 +103,6 @@ export default async function DetailClient({
           </div>
         </div>
       </header>
-      {/* --- CONTRATS --- */}
       <section className="mb-12">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-bold text-slate-800">
@@ -123,7 +118,7 @@ export default async function DetailClient({
             {contrats.map((contrat) => (
               <Link
                 key={contrat.id}
-                href={`/contrats/${contrat.id}`} // Lien vers la page détail contrat
+                href={`/contrats/${contrat.id}`}
                 className="block bg-white p-6 rounded-xl border border-slate-200 hover:border-blue-400 hover:shadow-md transition-all group"
               >
                 <div className="flex justify-between items-start mb-4">
@@ -140,7 +135,7 @@ export default async function DetailClient({
                 <div className="flex justify-between items-center border-t border-slate-50 pt-4 mt-4">
                   <span className="text-slate-400 text-sm">Tarif mensuel</span>
                   <span className="text-xl font-black text-slate-800">
-                    {contrat.tarif} €
+                    {contrat.tarif} DT
                   </span>
                 </div>
               </Link>
@@ -148,7 +143,6 @@ export default async function DetailClient({
           </div>
         )}
       </section>
-      {/* --- SINISTRES (CORRIGÉ) --- */}
       <section>
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-bold text-slate-800">
@@ -162,12 +156,11 @@ export default async function DetailClient({
             ✅ Aucun sinistre déclaré pour ce client.
           </div>
         ) : (
-          // ✅ CORRECTION : Utilisation d'une grille de cartes au lieu d'un tableau
           <div className="grid gap-4">
             {sinistres.map((s) => (
               <Link
                 key={s.id}
-                href={`/sinistres/${s.id}`} // Assure-toi que cette page existe si tu veux cliquer
+                href={`/sinistres/${s.id}`}
                 className="block bg-white p-4 rounded-xl border border-slate-200 hover:border-blue-400 hover:shadow-md transition-all flex justify-between items-center group"
               >
                 <div className="flex flex-col gap-1">

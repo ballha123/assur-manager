@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-// Définition locale de ce qu'est un contrat (juste ce dont on a besoin)
 interface Contrat {
   id: number;
   police: string;
@@ -21,7 +20,7 @@ export default function FormSinistre({ contrats, clientId, onSuccess }: Props) {
   const [description, setDescription] = useState("");
   const [date, setDate] = useState("");
   const [statut, setStatut] = useState("");
-  const [contratId, setContratId] = useState(contrats[0]?.id || ""); // Sélectionne le 1er par défaut
+  const [contratId, setContratId] = useState(contrats[0]?.id || "");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -55,7 +54,6 @@ export default function FormSinistre({ contrats, clientId, onSuccess }: Props) {
     }
   };
 
-  // Si le client n'a pas de contrat, on ne peut pas créer de sinistre
   if (contrats.length === 0) {
     return (
       <p className="text-red-500 text-center">
@@ -73,7 +71,7 @@ export default function FormSinistre({ contrats, clientId, onSuccess }: Props) {
         <select
           value={contratId}
           onChange={(e) => setContratId(Number(e.target.value))}
-          className="w-full p-3 border border-slate-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 outline-none"
+          className="text-black w-full p-3 border border-slate-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 outline-none"
         >
           {contrats.map((c) => (
             <option key={c.id} value={c.id}>
@@ -92,12 +90,12 @@ export default function FormSinistre({ contrats, clientId, onSuccess }: Props) {
           required
           value={date}
           onChange={(e) => setDate(e.target.value)}
-          className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+          className="text-black w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
         />
       </div>
 
       <div className="mb-6">
-        <label className="block text-slate-700 font-bold mb-2">
+        <label className="text-black  block text-slate-700 font-bold mb-2">
           Description
         </label>
         <textarea
@@ -106,7 +104,7 @@ export default function FormSinistre({ contrats, clientId, onSuccess }: Props) {
           placeholder="Ex: Accident de voiture..."
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+          className="text-black  w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
         />
       </div>
 

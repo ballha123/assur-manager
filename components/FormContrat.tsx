@@ -38,10 +38,8 @@ export default function FormContrat({ clientId, onSuccess }: FormProps) {
         if (onSuccess) {
           onSuccess();
         } else {
-          router.push(`/client/${clientId}`); // Sinon comportement classique
+          router.push(`/client/${clientId}`);
         }
-
-        // Reset du formulaire
         setPolice("");
         setTarif("");
       } else {
@@ -68,7 +66,7 @@ export default function FormContrat({ clientId, onSuccess }: FormProps) {
           placeholder="Ex: AUTO-1234"
           value={police}
           onChange={(e) => setPolice(e.target.value)}
-          className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+          className="text-black w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
         />
       </div>
 
@@ -79,7 +77,7 @@ export default function FormContrat({ clientId, onSuccess }: FormProps) {
         <select
           value={type}
           onChange={(e) => setType(e.target.value)}
-          className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white"
+          className="text-black w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white"
         >
           <option value="Automobile">🚗 Automobile</option>
           <option value="Habitation">🏠 Habitation</option>
@@ -89,8 +87,8 @@ export default function FormContrat({ clientId, onSuccess }: FormProps) {
       </div>
 
       <div className="mb-6">
-        <label className="block text-slate-700 font-bold mb-2">
-          Tarif Mensuel (€)
+        <label className="text-black block text-slate-700 font-bold mb-2">
+          Tarif Mensuel (DT)
         </label>
         <input
           type="number"
@@ -98,7 +96,7 @@ export default function FormContrat({ clientId, onSuccess }: FormProps) {
           placeholder="Ex: 50"
           value={tarif}
           onChange={(e) => setTarif(e.target.value)}
-          className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+          className="text-black w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
         />
       </div>
 

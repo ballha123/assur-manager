@@ -1,5 +1,5 @@
 import Link from "next/link";
-import SinistreActions from "@/components/SinistreActions"; // ✅ On importe les boutons
+import SinistreActions from "@/components/SinistreActions";
 import db from "@/src/lib/db";
 
 interface SinistreFull {
@@ -18,10 +18,8 @@ export default async function GestionSinistres({
   searchParams: Promise<{ statut?: string }>;
 }) {
   const params = await searchParams;
-  const filterStatut = params.statut; // Peut être undefined, "En cours", "Validé"...
+  const filterStatut = params.statut;
 
-  // 1. CONSTRUCTION DE LA REQUÊTE SQL
-  // On utilise des jointures pour avoir le nom du client et la police
   let sql = `
     SELECT 
       Sinistre.*, 
@@ -35,7 +33,6 @@ export default async function GestionSinistres({
 
   const args = [];
 
-  // Si on a un filtre dans l'URL (?statut=En cours), on filtre le SQL
   if (filterStatut) {
     sql += " WHERE Sinistre.statut = ?";
     args.push(filterStatut);
@@ -55,7 +52,6 @@ export default async function GestionSinistres({
           <p className="text-slate-500">Gérez les demandes entrantes</p>
         </header>
 
-        {/* --- ONGLETS DE FILTRES --- */}
         <div className="flex gap-4 mb-6">
           <Link
             href="/sinistres"
@@ -77,7 +73,6 @@ export default async function GestionSinistres({
           </Link>
         </div>
 
-        {/* --- LISTE DES SINISTRES --- */}
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
           <table className="w-full text-left text-sm text-slate-600">
             <thead className="bg-slate-50 border-b border-slate-200">
@@ -119,7 +114,6 @@ export default async function GestionSinistres({
                     </span>
                   </td>
                   <td className="p-4 text-right">
-                    {/* ✅ On appelle le composant Client ici */}
                     {s.statut === "En cours" && <SinistreActions id={s.id} />}
                   </td>
                 </tr>

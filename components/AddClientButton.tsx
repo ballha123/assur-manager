@@ -9,20 +9,15 @@ export default function AddClientButton() {
 
   return (
     <>
-      {/* LE BOUTON DÉCLENCHEUR */}
       <button
         onClick={() => setIsOpen(true)}
         className="text-blue-600 font-semibold text-sm hover:underline bg-blue-50 px-3 py-1 rounded-full transition-colors hover:bg-blue-100"
       >
         + Ajouter un client
       </button>
-
-      {/* LA MODALE (POPUP) */}
       {isOpen && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in duration-200">
-          {/* La boîte blanche */}
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200">
-            {/* Header de la modale */}
             <div className="bg-slate-50 p-4 border-b border-slate-100 flex justify-between items-center">
               <h2 className="text-lg font-bold text-slate-800">
                 Nouveau Client
@@ -36,9 +31,7 @@ export default function AddClientButton() {
             </div>
 
             <div className="p-6">
-              <FormClient
-                onSuccess={() => setIsOpen(false)} // Ferme la modale quand c'est fini
-              />
+              <FormClient onSuccess={() => setIsOpen(false)} />
             </div>
           </div>
         </div>

@@ -3,7 +3,6 @@
 import { useState } from "react";
 import FormSinistre from "./FormSinistre";
 
-// On doit passer les contrats au formulaire
 export default function AddSinistreButton({
   contrats,
   clientId,

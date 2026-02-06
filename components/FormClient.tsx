@@ -31,12 +31,12 @@ export default function FormContrat({ onSuccess }: FormProps) {
       });
 
       if (response.ok) {
-        router.refresh(); // Rafraîchit les données de la page derrière
+        router.refresh();
 
         if (onSuccess) {
-          onSuccess(); // ✅ Si on est dans une modale, on la ferme
+          onSuccess();
         } else {
-          router.push(`/client`); // Sinon comportement classique
+          router.push(`/client`);
         }
       } else {
         const errorData = await response.json();
@@ -60,7 +60,7 @@ export default function FormContrat({ onSuccess }: FormProps) {
           placeholder="Ex: AUTO-1234"
           value={nom}
           onChange={(e) => setNom(e.target.value)}
-          className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+          className="text-black w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
         />
       </div>
 
@@ -83,7 +83,7 @@ export default function FormContrat({ onSuccess }: FormProps) {
           placeholder="Ex: 50"
           value={telephone}
           onChange={(e) => setTelephone(e.target.value)}
-          className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+          className=" text-black w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
         />
       </div>
 

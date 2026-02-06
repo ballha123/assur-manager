@@ -1,15 +1,14 @@
 import db from "@/src/lib/db";
 import Link from "next/link";
 
-// 1. DÉFINITION DES TYPES
 interface ContratDetail {
   id: number;
   police: string;
   type: string;
   tarif: number;
   clientId: number;
-  nomClient: string; // Récupéré via JOIN
-  emailClient: string; // Récupéré via JOIN
+  nomClient: string;
+  emailClient: string;
 }
 
 interface Sinistre {
@@ -26,7 +25,6 @@ export default async function PageContrat({
 }) {
   const { id } = await params;
 
-  // 2. REQUÊTE CONTRAT + CLIENT (JOIN)
   const contrat = db
     .prepare(
       `
@@ -52,14 +50,12 @@ export default async function PageContrat({
     );
   }
 
-  // 3. REQUÊTE SINISTRES (Liés à ce contrat)
   const sinistres = db
     .prepare("SELECT * FROM Sinistre WHERE contratId = ?")
     .all(id) as Sinistre[];
 
   return (
     <main className="min-h-screen bg-slate-50 p-8 font-sans">
-      {/* --- EN-TÊTE CONTRAT --- */}
       <header className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 mb-8">
         <div className="flex justify-between items-start">
           <div>
@@ -90,7 +86,7 @@ export default async function PageContrat({
               Tarif Mensuel
             </p>
             <p className="text-slate-800 font-black text-2xl">
-              {contrat.tarif} €
+              {contrat.tarif} DT
             </p>
           </div>
           <div>
@@ -101,8 +97,6 @@ export default async function PageContrat({
           </div>
         </div>
       </header>
-
-      {/* --- LISTE DES SINISTRES DU CONTRAT --- */}
       <section>
         <h2 className="text-xl font-bold text-slate-800 mb-6">
           Sinistres rattachés ({sinistres.length})

@@ -8,8 +8,6 @@ export async function DELETE(
   try {
     const { id } = await params;
 
-    // 1. On supprime le client
-    // Grâce à "ON DELETE CASCADE" dans ta BDD, ça supprimera aussi ses contrats et sinistres automatiquement !
     const stmt = db.prepare("DELETE FROM Client WHERE id = ?");
     const info = stmt.run(id);
 
