@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-
+import Image from "next/image";
+import bgImage from "@/assets/login.jpeg";
 export default function LoginPage() {
   const router = useRouter();
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -38,9 +39,6 @@ export default function LoginPage() {
 
   return (
     <main className="min-h-screen relative flex items-center justify-center bg-slate-50 p-4 font-sans">
-      <div className="absolute inset-0 z-0">
-        <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"></div>
-      </div>
       <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border border-slate-100">
         <div className="text-center mb-8">
           <div className="bg-blue-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
