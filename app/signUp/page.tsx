@@ -92,7 +92,7 @@ export default function RegisterPage() {
             className={`w-full py-3 rounded-lg font-bold text-white transition-all transform active:scale-95 ${
               loading
                 ? "bg-slate-400 cursor-not-allowed"
-                : "bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-200"
+                : "bg-black hover:bg-slate-800 shadow-lg"
             }`}
           >
             {loading ? "Création en cours..." : "S'inscrire"}

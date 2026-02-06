@@ -29,7 +29,7 @@ export default function RevenueChart({ data }: Props) {
   }
 
   return (
-    <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 h-[400px]">
+    <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 h-[370]">
       <h3 className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-6">
         Répartition du Chiffre d'Affaires
       </h3>
@@ -56,7 +56,7 @@ export default function RevenueChart({ data }: Props) {
           />
 
           <Tooltip
-            cursor={{ fill: "#f1f5f9" }}
+            cursor={{ fill: "#c0d4e4ff" }}
             contentStyle={{
               borderRadius: "8px",
               border: "none",
@@ -66,7 +66,7 @@ export default function RevenueChart({ data }: Props) {
 
           <Bar
             dataKey="total"
-            fill="#3b82f6"
+            fill="#b8634eff"
             radius={[4, 4, 0, 0]}
             barSize={50}
           />
