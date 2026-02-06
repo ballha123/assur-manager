@@ -1,65 +1,163 @@
-import Image from "next/image";
+import AddClientButton from "@/components/AddClientButton";
+import RevenueChart from "@/components/RevenueChart";
+import SearchBar from "@/components/SearchBar";
+import db from "@/src/lib/db";
+import Link from "next/link";
+interface ChartData {
+  name: string;
+  total: number;
+}
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string }>;
+}) {
+  const params = await searchParams;
+  const query = params.q || "";
+  const searchTerm = `%${query}%`;
+  const data = db
+    .prepare(
+      `SELECT 
+  type as name, 
+  SUM(tarif) as total 
+FROM Contrat 
+GROUP BY type`,
+    )
+    .all() as ChartData[];
+  const clients = db
+    .prepare(
+      `
+    SELECT 
+      Client.*, 
+      COUNT(Contrat.id) as nombreContrats 
+    FROM Client 
+    LEFT JOIN Contrat ON Client.id = Contrat.clientId 
+    WHERE Client.nom LIKE ? OR Client.email LIKE ? 
+    GROUP BY Client.id
+    ORDER BY Client.id DESC
+  `,
+    )
+    .all(searchTerm, searchTerm);
 
-export default function Home() {
+  // B. On calcule les chiffres clés pour le haut de page
+  const stats = {
+    clients: db.prepare("SELECT COUNT(*) as count FROM Client").get() as {
+      count: number;
+    },
+    contrats: db.prepare("SELECT COUNT(*) as count FROM Contrat").get() as {
+      count: number;
+    },
+    sinistres: db.prepare("SELECT COUNT(*) as count FROM Sinistre").get() as {
+      count: number;
+    },
+  };
+
+  // 2. AFFICHAGE (Le Rendu)
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <main className="min-h-screen bg-slate-50 p-8 font-sans">
+      <div className="max-w-md mb-6">
+        <SearchBar />
+      </div>
+      {/* --- EN-TÊTE --- */}
+      <header className="flex justify-between items-center mb-10">
+        <div>
+          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
+            AssurManager <span className="text-blue-600">Pro</span>
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+          <p className="text-slate-500 mt-1">Tableau de bord de gestion</p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+        <AddClientButton />
+      </header>
+
+      {/* --- STATISTIQUES (Les Cartes du haut) --- */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        {/* Carte Clients */}
+        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col">
+          <span className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">
+            Portefeuille Clients
+          </span>
+          <span className="text-4xl font-black text-slate-800">
+            {stats.clients.count}
+          </span>
         </div>
-      </main>
-    </div>
+
+        {/* Carte Contrats */}
+        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col">
+          <span className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">
+            Contrats Actifs
+          </span>
+          <span className="text-4xl font-black text-blue-600">
+            {stats.contrats.count}
+          </span>
+        </div>
+
+        {/* Carte Sinistres */}
+        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col">
+          <span className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">
+            Sinistres en cours
+          </span>
+          <span className="text-4xl font-black text-red-500">
+            {stats.sinistres.count}
+          </span>
+        </div>
+      </div>
+      <section className="mb-10">
+        <RevenueChart data={data} />
+      </section>
+
+      {/* --- LISTE DES CLIENTS --- */}
+      <section>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-bold text-slate-800">Derniers Clients</h2>
+          <span className="text-sm text-slate-400">
+            Total : {clients.length}
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+          {clients.map((client: any) => (
+            <Link
+              key={client.id}
+              href={`/client/${client.id}`} // Lien vers la page détail (étape suivante)
+              className="group block bg-white p-6 rounded-2xl border border-slate-200 hover:border-blue-500 hover:shadow-md transition-all duration-200"
+            >
+              <div className="flex justify-between items-start mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 bg-slate-100 rounded-full flex items-center justify-center text-lg">
+                    👤
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-slate-900 group-hover:text-blue-600 transition-colors">
+                      {client.nom}
+                    </h3>
+                    <p className="text-xs text-slate-400">ID: #{client.id}</p>
+                  </div>
+                </div>
+                {client.nombreContrats > 0 ? (
+                  <span className="bg-green-100 text-green-700 text-xs font-bold px-2 py-1 rounded-md">
+                    {client.nombreContrats} Contrat(s)
+                  </span>
+                ) : (
+                  <span className="bg-slate-100 text-slate-500 text-xs font-bold px-2 py-1 rounded-md">
+                    Prospect
+                  </span>
+                )}
+              </div>
+
+              <div className="space-y-2 text-sm text-slate-600 mb-4">
+                <p className="flex items-center gap-2">📧 {client.email}</p>
+                <p className="flex items-center gap-2">📞 {client.telephone}</p>
+              </div>
+
+              <div className="pt-4 border-t border-slate-50 flex justify-end">
+                <span className="text-blue-600 text-sm font-semibold group-hover:translate-x-1 transition-transform">
+                  Voir le dossier &rarr;
+                </span>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
+    </main>
   );
 }
