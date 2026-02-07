@@ -31,7 +31,7 @@ export default async function GestionSinistres({
     JOIN Client ON Contrat.clientId = Client.id
   `;
 
-  const args = [];
+  const args: any[] = [];
 
   if (filterStatut) {
     sql += " WHERE Sinistre.statut = ?";
@@ -40,7 +40,13 @@ export default async function GestionSinistres({
 
   sql += " ORDER BY dateDeclaration DESC";
 
-  const sinistres = db.prepare(sql).all(...args) as SinistreFull[];
+  // ✅ CORRECTION TURSO : db.execute au lieu de db.prepare
+  const { rows } = await db.execute({
+    sql: sql,
+    args: args,
+  });
+
+  const sinistres = rows as unknown as SinistreFull[];
 
   return (
     <main className="min-h-screen bg-slate-50 p-8 font-sans">

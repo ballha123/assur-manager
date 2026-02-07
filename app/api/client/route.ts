@@ -13,20 +13,22 @@ export async function POST(req: Request) {
       );
     }
 
-    const stmt = db.prepare(
-      "INSERT INTO Client (nom, email, telephone) VALUES (?, ?, ?)",
-    );
-
-    const info = stmt.run(nom, email, telephone);
+    const result = await db.execute({
+      sql: "INSERT INTO Client (nom, email, telephone) VALUES (?, ?, ?)",
+      args: [nom, email, telephone],
+    });
 
     return NextResponse.json({
       success: true,
-      clientId: info.lastInsertRowid,
+      clientId: result.lastInsertRowid?.toString(),
     });
   } catch (error: any) {
     console.error(error);
 
-    if (error.code === "SQLITE_CONSTRAINT_UNIQUE") {
+    if (
+      error?.code === "SQLITE_CONSTRAINT_UNIQUE" ||
+      error?.message?.includes("UNIQUE constraint failed")
+    ) {
       return NextResponse.json(
         { error: "Cet email existe déjà." },
         { status: 409 },

@@ -13,17 +13,19 @@ export async function POST(req: Request) {
       );
     }
 
-    const stmt = db.prepare(
-      "INSERT INTO Contrat (police, type, tarif, clientId) VALUES (?, ?, ?, ?)",
-    );
-
-    stmt.run(police, type, tarif, clientId);
+    await db.execute({
+      sql: "INSERT INTO Contrat (police, type, tarif, clientId) VALUES (?, ?, ?, ?)",
+      args: [police, type, tarif, clientId],
+    });
 
     return NextResponse.json({ success: true });
   } catch (error: any) {
     console.error("Erreur API Contrat:", error);
 
-    if (error.code === "SQLITE_CONSTRAINT_UNIQUE") {
+    if (
+      error?.code === "SQLITE_CONSTRAINT_UNIQUE" ||
+      error?.message?.includes("UNIQUE constraint failed")
+    ) {
       return NextResponse.json(
         { error: "Ce numéro de police existe déjà." },
         { status: 409 },

@@ -19,9 +19,11 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { email, password } = body;
 
-    const user = db
-      .prepare("SELECT * FROM User WHERE email = ?")
-      .get(email) as Agent;
+    const { rows } = await db.execute({
+      sql: "SELECT * FROM User WHERE email = ?",
+      args: [email],
+    });
+    const user = rows[0] as unknown as Agent;
 
     if (!user) {
       return NextResponse.json({ error: "Email inconnu" }, { status: 401 });

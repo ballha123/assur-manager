@@ -4,10 +4,12 @@ import RevenueChart from "@/components/RevenueChart";
 import SearchBar from "@/components/SearchBar";
 import db from "@/src/lib/db";
 import Link from "next/link";
+
 interface ChartData {
   name: string;
   total: number;
 }
+
 export default async function Home({
   searchParams,
 }: {
@@ -16,41 +18,43 @@ export default async function Home({
   const params = await searchParams;
   const query = params.q || "";
   const searchTerm = `%${query}%`;
-  const data = db
-    .prepare(
-      `SELECT 
-  type as name, 
-  SUM(tarif) as total 
-FROM Contrat 
-GROUP BY type`,
-    )
-    .all() as ChartData[];
-  const clients = db
-    .prepare(
-      `
+
+  const { rows: dataRows } = await db.execute(`
     SELECT 
-      Client.*, 
-      COUNT(Contrat.id) as nombreContrats 
-    FROM Client 
-    LEFT JOIN Contrat ON Client.id = Contrat.clientId 
-    WHERE Client.nom LIKE ? OR Client.email LIKE ? 
-    GROUP BY Client.id
-    ORDER BY Client.id DESC
-  `,
-    )
-    .all(searchTerm, searchTerm);
+      type as name, 
+      SUM(tarif) as total 
+    FROM Contrat 
+    GROUP BY type
+  `);
+  const data = dataRows as unknown as ChartData[];
+
+  const { rows: clientRows } = await db.execute({
+    sql: `
+      SELECT 
+        Client.*, 
+        COUNT(Contrat.id) as nombreContrats 
+      FROM Client 
+      LEFT JOIN Contrat ON Client.id = Contrat.clientId 
+      WHERE Client.nom LIKE ? OR Client.email LIKE ? 
+      GROUP BY Client.id
+      ORDER BY Client.id DESC
+    `,
+    args: [searchTerm, searchTerm],
+  });
+  const clients = clientRows as any[];
+
+  const [clientsRes, contratsRes, sinistresRes] = await Promise.all([
+    db.execute("SELECT COUNT(*) as count FROM Client"),
+    db.execute("SELECT COUNT(*) as count FROM Contrat"),
+    db.execute("SELECT COUNT(*) as count FROM Sinistre"),
+  ]);
 
   const stats = {
-    clients: db.prepare("SELECT COUNT(*) as count FROM Client").get() as {
-      count: number;
-    },
-    contrats: db.prepare("SELECT COUNT(*) as count FROM Contrat").get() as {
-      count: number;
-    },
-    sinistres: db.prepare("SELECT COUNT(*) as count FROM Sinistre").get() as {
-      count: number;
-    },
+    clients: { count: Number(clientsRes.rows[0].count) },
+    contrats: { count: Number(contratsRes.rows[0].count) },
+    sinistres: { count: Number(sinistresRes.rows[0].count) },
   };
+
   return (
     <main className="min-h-screen bg-slate-50 p-8 font-sans">
       <div className="max-w-md mx-auto mb-6">
@@ -62,13 +66,13 @@ GROUP BY type`,
       </div>
 
       <header className="flex justify-between items-center mb-10">
-        <div className="absolute top-4 left">
+        <div>
           <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
             AssurManager <span className="text-blue-600">Pro</span>
           </h1>
           <p className="text-slate-500 mt-1">Tableau de bord de gestion</p>
         </div>
-        <div className=" ml-auto">
+        <div className="ml-auto">
           <AddClientButton />
         </div>
       </header>
@@ -101,9 +105,11 @@ GROUP BY type`,
           </span>
         </div>
       </div>
+
       <section className="mb-10">
         <RevenueChart data={data} />
       </section>
+
       <section>
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-bold text-slate-800">Derniers Clients</h2>

@@ -25,9 +25,9 @@ export default async function PageContrat({
 }) {
   const { id } = await params;
 
-  const contrat = db
-    .prepare(
-      `
+  // 1. REQUÊTE CONTRAT (Turso)
+  const { rows: contratRows } = await db.execute({
+    sql: `
     SELECT 
       Contrat.*, 
       Client.nom as nomClient,
@@ -36,8 +36,9 @@ export default async function PageContrat({
     JOIN Client ON Contrat.clientId = Client.id
     WHERE Contrat.id = ?
   `,
-    )
-    .get(id) as ContratDetail;
+    args: [id],
+  });
+  const contrat = contratRows[0] as unknown as ContratDetail;
 
   if (!contrat) {
     return (
@@ -50,9 +51,12 @@ export default async function PageContrat({
     );
   }
 
-  const sinistres = db
-    .prepare("SELECT * FROM Sinistre WHERE contratId = ?")
-    .all(id) as Sinistre[];
+  // 2. REQUÊTE SINISTRES (Turso)
+  const { rows: sinistresRows } = await db.execute({
+    sql: "SELECT * FROM Sinistre WHERE contratId = ?",
+    args: [id],
+  });
+  const sinistres = sinistresRows as unknown as Sinistre[];
 
   return (
     <main className="min-h-screen bg-slate-50 p-8 font-sans">
@@ -111,7 +115,7 @@ export default async function PageContrat({
             {sinistres.map((s) => (
               <Link
                 key={s.id}
-                href={`/sinistres/${s.id}`}
+                href={`/sinistre/${s.id}`}
                 className="block bg-white p-4 rounded-xl border border-slate-200 hover:border-blue-400 hover:shadow-md transition-all flex justify-between items-center"
               >
                 <div>

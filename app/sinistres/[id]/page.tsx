@@ -1,15 +1,17 @@
 import db from "@/src/lib/db";
 import Link from "next/link";
 
+// On définit ce qu'on va récupérer de la base de données
+// Grâce aux JOIN, on aura aussi des infos du Contrat et du Client
 interface SinistreDetail {
   id: number;
   description: string;
   dateDeclaration: string;
   statut: string;
   contratId: number;
-  police: string;
-  clientId: number;
-  nomClient: string;
+  police: string; // Récupéré via JOIN Contrat
+  clientId: number; // Récupéré via JOIN Client
+  nomClient: string; // Récupéré via JOIN Client
   emailClient: string;
 }
 
@@ -20,9 +22,9 @@ export default async function PageSinistre({
 }) {
   const { id } = await params;
 
-  const sinistre = db
-    .prepare(
-      `
+  // 🧠 LA REQUÊTE INTELLIGENTE (DOUBLE JOIN) - Version Turso
+  const { rows } = await db.execute({
+    sql: `
     SELECT 
       Sinistre.*, 
       Contrat.police,
@@ -34,9 +36,12 @@ export default async function PageSinistre({
     JOIN Client ON Contrat.clientId = Client.id
     WHERE Sinistre.id = ?
   `,
-    )
-    .get(id) as SinistreDetail;
+    args: [id],
+  });
 
+  const sinistre = rows[0] as unknown as SinistreDetail;
+
+  // Sécurité si l'ID n'existe pas
   if (!sinistre) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50">
@@ -49,6 +54,8 @@ export default async function PageSinistre({
       </div>
     );
   }
+
+  // Couleurs dynamiques selon le statut
   const statusColors =
     {
       "En cours": "bg-yellow-100 text-yellow-800 border-yellow-200",
@@ -65,6 +72,7 @@ export default async function PageSinistre({
         ← Retour
       </Link>
       <div className="w-full max-w-2xl">
+        {/* Fil d'ariane (Breadcrumb) */}
         <div className="mb-6 flex items-center gap-2 text-sm text-slate-500">
           <Link href="/" className="hover:text-blue-600">
             Dashboard
@@ -83,6 +91,7 @@ export default async function PageSinistre({
         </div>
 
         <div className="bg-white p-8 rounded-2xl shadow-lg border border-slate-100">
+          {/* En-tête avec Statut */}
           <div className="flex justify-between items-start mb-8 pb-6 border-b border-slate-100">
             <div>
               <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mb-1">
@@ -103,7 +112,9 @@ export default async function PageSinistre({
             </span>
           </div>
 
+          {/* Informations Détaillées */}
           <div className="grid gap-6">
+            {/* Bloc Description */}
             <div>
               <h3 className="text-sm font-bold text-slate-900 uppercase mb-2">
                 Description de l'incident
@@ -113,6 +124,7 @@ export default async function PageSinistre({
               </div>
             </div>
 
+            {/* Bloc Contexte (Contrat & Client) */}
             <div className="grid grid-cols-2 gap-4 mt-2">
               <div className="bg-blue-50 p-4 rounded-xl border border-blue-100">
                 <p className="text-xs text-blue-600 font-bold uppercase mb-1">
@@ -140,6 +152,7 @@ export default async function PageSinistre({
             </div>
           </div>
 
+          {/* Actions (Retour) */}
           <div className="mt-10 pt-6 border-t border-slate-100">
             <Link
               href={`/client/${sinistre.clientId}`}

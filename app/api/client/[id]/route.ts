@@ -8,10 +8,12 @@ export async function DELETE(
   try {
     const { id } = await params;
 
-    const stmt = db.prepare("DELETE FROM Client WHERE id = ?");
-    const info = stmt.run(id);
+    const result = await db.execute({
+      sql: "DELETE FROM Client WHERE id = ?",
+      args: [id],
+    });
 
-    if (info.changes === 0) {
+    if (result.rowsAffected === 0) {
       return NextResponse.json(
         { error: "Client introuvable" },
         { status: 404 },

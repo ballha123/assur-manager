@@ -17,11 +17,11 @@ export async function POST(req: Request) {
         { status: 400 },
       );
     }
-    const stmt = db.prepare(
-      "INSERT INTO Sinistre (description, dateDeclaration, statut, contratId) VALUES (?, ?, ?, ?)",
-    );
 
-    stmt.run(description, dateDeclaration, statut, contratId);
+    await db.execute({
+      sql: "INSERT INTO Sinistre (description, dateDeclaration, statut, contratId) VALUES (?, ?, ?, ?)",
+      args: [description, dateDeclaration, statut, contratId],
+    });
 
     return NextResponse.json({ success: true });
   } catch (error) {

@@ -14,9 +14,11 @@ export async function POST(req: Request) {
       );
     }
 
-    const existingUser = db
-      .prepare("SELECT * FROM User WHERE email = ?")
-      .get(email);
+    const { rows } = await db.execute({
+      sql: "SELECT * FROM User WHERE email = ?",
+      args: [email],
+    });
+    const existingUser = rows[0];
 
     if (existingUser) {
       return NextResponse.json(
@@ -27,8 +29,10 @@ export async function POST(req: Request) {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const stmt = db.prepare("INSERT INTO User (email, password) VALUES (?, ?)");
-    stmt.run(email, hashedPassword);
+    await db.execute({
+      sql: "INSERT INTO User (email, password) VALUES (?, ?)",
+      args: [email, hashedPassword],
+    });
 
     return NextResponse.json({
       success: true,

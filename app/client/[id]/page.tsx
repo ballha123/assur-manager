@@ -34,9 +34,11 @@ export default async function DetailClient({
 }) {
   const { id } = await params;
 
-  const client = db
-    .prepare("SELECT * FROM Client WHERE id = ?")
-    .get(id) as Client;
+  const { rows: clientRows } = await db.execute({
+    sql: "SELECT * FROM Client WHERE id = ?",
+    args: [id],
+  });
+  const client = clientRows[0] as unknown as Client;
 
   if (!client) {
     return (
@@ -49,29 +51,25 @@ export default async function DetailClient({
     );
   }
 
-  const contrats = db
-    .prepare("SELECT * FROM Contrat WHERE clientId = ?")
-    .all(id) as Contrat[];
+  const { rows: contratsRows } = await db.execute({
+    sql: "SELECT * FROM Contrat WHERE clientId = ?",
+    args: [id],
+  });
+  const contrats = contratsRows as unknown as Contrat[];
 
-  const sinistres = db
-    .prepare(
-      `
+  const { rows: sinistresRows } = await db.execute({
+    sql: `
     SELECT Sinistre.*, Contrat.police 
     FROM Sinistre
     JOIN Contrat ON Sinistre.contratId = Contrat.id
     WHERE Contrat.clientId = ?
   `,
-    )
-    .all(id) as Sinistre[];
+    args: [id],
+  });
+  const sinistres = sinistresRows as unknown as Sinistre[];
 
   return (
     <main className="min-h-screen bg-slate-50 p-8 font-sans">
-      <Link
-        href="/"
-        className="text-slate-500 hover:text-slate-800 font-medium"
-      >
-        ← Retour
-      </Link>
       <header className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 mb-8">
         <div className="flex justify-between items-start">
           <div>
@@ -85,7 +83,15 @@ export default async function DetailClient({
               ID Client : #{client.id}
             </p>
           </div>
-          <DeleteButton id={client.id} type="client" />
+          <div className="flex flex-col items-end gap-2">
+            <Link
+              href="/"
+              className="text-slate-500 hover:text-slate-800 font-medium"
+            >
+              ← Retour
+            </Link>
+            <DeleteButton id={client.id} type="client" />
+          </div>
         </div>
 
         <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-slate-100 pt-6">
