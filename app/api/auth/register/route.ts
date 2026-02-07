@@ -15,7 +15,7 @@ export async function POST(req: Request) {
     }
 
     const { rows } = await db.execute({
-      sql: "SELECT * FROM Agent WHERE email = ?",
+      sql: "SELECT * FROM User WHERE email = ?",
       args: [email],
     });
 
