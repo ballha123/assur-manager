@@ -3,15 +3,18 @@ import { createClient } from "@libsql/client";
 const url = process.env.TURSO_DATABASE_URL;
 const authToken = process.env.TURSO_AUTH_TOKEN;
 
+const finalUrl = url || "libsql://db-placeholder.turso.io";
+const finalToken = authToken || "token-placeholder";
+
 if (!url) {
-  throw new Error(
-    "🚨 ERREUR CRITIQUE : La variable d'environnement 'TURSO_DATABASE_URL' est manquante. Vérifiez votre fichier .env.local ou les réglages Vercel.",
+  console.warn(
+    "⚠️ ATTENTION : Variables Turso manquantes. (Ceci est normal pendant la phase de Build)",
   );
 }
 
 const db = createClient({
-  url,
-  authToken,
+  url: finalUrl,
+  authToken: finalToken,
 });
 
 export default db;
