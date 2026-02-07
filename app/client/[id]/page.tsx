@@ -1,8 +1,9 @@
 import Link from "next/link";
 import AddContractButton from "@/components/AddContractButton";
 import AddSinistreButton from "@/components/AddSinistreButton";
-import db from "@/src/lib/db";
+
 import DeleteButton from "@/components/DeleteButton";
+import db from "@/src/lib/db";
 
 interface Client {
   id: number;
@@ -38,9 +39,8 @@ export default async function DetailClient({
     sql: "SELECT * FROM Client WHERE id = ?",
     args: [id],
   });
-  const client = clientRows[0] as unknown as Client;
 
-  if (!client) {
+  if (clientRows.length === 0) {
     return (
       <div className="p-10 text-center">
         <h1 className="text-red-500 font-bold text-2xl">Client introuvable</h1>
@@ -50,12 +50,16 @@ export default async function DetailClient({
       </div>
     );
   }
+  const client = { ...clientRows[0] } as unknown as Client;
 
   const { rows: contratsRows } = await db.execute({
     sql: "SELECT * FROM Contrat WHERE clientId = ?",
     args: [id],
   });
-  const contrats = contratsRows as unknown as Contrat[];
+
+  const contrats = contratsRows.map((row) => ({
+    ...row,
+  })) as unknown as Contrat[];
 
   const { rows: sinistresRows } = await db.execute({
     sql: `
@@ -66,10 +70,19 @@ export default async function DetailClient({
   `,
     args: [id],
   });
-  const sinistres = sinistresRows as unknown as Sinistre[];
+
+  const sinistres = sinistresRows.map((row) => ({
+    ...row,
+  })) as unknown as Sinistre[];
 
   return (
     <main className="min-h-screen bg-slate-50 p-8 font-sans">
+      <Link
+        href="/"
+        className="text-slate-500 hover:text-slate-800 font-medium"
+      >
+        ← Retour
+      </Link>
       <header className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 mb-8">
         <div className="flex justify-between items-start">
           <div>
@@ -84,12 +97,6 @@ export default async function DetailClient({
             </p>
           </div>
           <div className="flex flex-col items-end gap-2">
-            <Link
-              href="/"
-              className="text-slate-500 hover:text-slate-800 font-medium"
-            >
-              ← Retour
-            </Link>
             <DeleteButton id={client.id} type="client" />
           </div>
         </div>
@@ -109,6 +116,7 @@ export default async function DetailClient({
           </div>
         </div>
       </header>
+
       <section className="mb-12">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-bold text-slate-800">
@@ -124,7 +132,7 @@ export default async function DetailClient({
             {contrats.map((contrat) => (
               <Link
                 key={contrat.id}
-                href={`/contrats/${contrat.id}`}
+                href={`/contrat/${contrat.id}`}
                 className="block bg-white p-6 rounded-xl border border-slate-200 hover:border-blue-400 hover:shadow-md transition-all group"
               >
                 <div className="flex justify-between items-start mb-4">
@@ -149,6 +157,7 @@ export default async function DetailClient({
           </div>
         )}
       </section>
+
       <section>
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-bold text-slate-800">
