@@ -16,8 +16,8 @@ const PUBLIC_ROUTES = [
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  console.log(`🔒 Vérification Middleware : ${pathname}`);
 
+  // 1. Autoriser explicitement les routes publiques et fichiers statiques
   if (
     PUBLIC_ROUTES.some((route) => pathname.startsWith(route)) ||
     pathname.startsWith("/_next") ||
@@ -29,8 +29,9 @@ export async function middleware(request: NextRequest) {
 
   const token = request.cookies.get("session_token")?.value;
 
+  // 2. Redirection si pas de token
   if (!token) {
-    console.log("⛔ Accès refusé : Pas de token -> Redirection Login");
+    console.log(`⛔ Accès refusé [${pathname}] : Redirection Login`);
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
@@ -38,13 +39,14 @@ export async function middleware(request: NextRequest) {
     await jwtVerify(token, encodedKey);
     return NextResponse.next();
   } catch (error) {
-    console.log("❌ Token invalide -> Redirection Login");
+    console.log("❌ Token invalide -> Suppression et Redirection");
     const response = NextResponse.redirect(new URL("/login", request.url));
     response.cookies.delete("session_token");
     return response;
   }
 }
 
+// MISE À JOUR : On exclut api/auth du matcher pour éviter le bug "resp.body?.cancel"
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+  matcher: ["/((?!api/auth|_next/static|_next/image|favicon.ico).*)"],
 };
