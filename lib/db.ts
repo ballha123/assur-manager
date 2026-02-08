@@ -9,9 +9,12 @@ console.log(`[DB] Mode: ${process.env.NODE_ENV}`);
 console.log(`[DB] URL définie ? ${url ? "OUI" : "NON"}`);
 
 // 2. CONFIGURATION INTELLIGENTE
-// Si l'URL manque (même en prod), on ne crashe pas. On utilise un placeholder.
+// Si l'URL manque (même en prod), on ne crashe pas. On utilise un placeholder HTTP.
 // Cela permet à "npm run build" de finir sans erreur même si les envs sont mal chargées.
-const finalUrl = url ? url.replace("libsql://", "https://") : "file:local.db";
+// IMPORTANT : Le client "web" ne supporte pas "file:", il faut du "https:"
+const finalUrl = url
+  ? url.replace("libsql://", "https://")
+  : "https://placeholder-db.turso.io";
 const finalToken = authToken || "token-placeholder";
 
 if (!url) {
