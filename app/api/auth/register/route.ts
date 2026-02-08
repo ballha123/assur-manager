@@ -1,5 +1,5 @@
 // Assure-toi que l'import pointe bien vers ton client LibSQL (Turso)
-import db from "@/src/lib/db";
+import db from "@/lib/db";
 import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
 

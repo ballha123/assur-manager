@@ -3,7 +3,7 @@ import AddContractButton from "@/components/AddContractButton";
 import AddSinistreButton from "@/components/AddSinistreButton";
 
 import DeleteButton from "@/components/DeleteButton";
-import db from "@/src/lib/db";
+import db from "@/lib/db";
 
 interface Client {
   id: number;

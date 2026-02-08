@@ -1,4 +1,4 @@
-import db from "@/src/lib/db";
+import db from "@/lib/db";
 import Link from "next/link";
 
 // On définit ce qu'on va récupérer de la base de données

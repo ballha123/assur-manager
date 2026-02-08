@@ -2,7 +2,7 @@ import AddClientButton from "@/components/AddClientButton";
 import LogoutButton from "@/components/LogoutButton";
 import RevenueChart from "@/components/RevenueChart";
 import SearchBar from "@/components/SearchBar";
-import db from "@/src/lib/db";
+import db from "@/lib/db";
 
 import Link from "next/link";
 

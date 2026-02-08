@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { SignJWT } from "jose";
 import { cookies } from "next/headers";
-import db from "@/src/lib/db";
+import db from "@/lib/db";
 
 interface Agent {
   id: number;
