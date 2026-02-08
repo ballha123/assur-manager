@@ -1,40 +1,32 @@
+// Assure-toi que l'import pointe bien vers ton client LibSQL (Turso)
 import db from "@/src/lib/db";
 import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json().catch(() => null);
-
-    if (!body) {
-      return NextResponse.json(
-        { error: "Corps de la requête invalide." },
-        { status: 400 },
-      );
-    }
-
+    const body = await req.json();
     const { email, password } = body;
 
-    if (!email || !password) {
-      return NextResponse.json(
-        { error: "Email et mot de passe obligatoires." },
-        { status: 400 },
-      );
-    }
+    // 1. Vérifier la connexion DB et la table
+    const userExists = await db
+      .execute({
+        sql: "SELECT * FROM User WHERE email = ?",
+        args: [email],
+      })
+      .catch((err) => {
+        // Si tu vois ce log, c'est que la table "User" n'existe pas sur Turso
+        console.error("Erreur d'accès à la table User:", err);
+        throw new Error("La table User n'existe pas dans la base Turso.");
+      });
 
-    const { rows } = await db.execute({
-      sql: "SELECT * FROM User WHERE email = ?",
-      args: [email],
-    });
-
-    if (rows && rows.length > 0) {
+    if (userExists.rows.length > 0) {
       return NextResponse.json(
         { error: "Cet email existe déjà." },
         { status: 409 },
       );
     }
 
-    // Hachage et Insertion
     const hashedPassword = await bcrypt.hash(password, 10);
 
     await db.execute({
@@ -42,22 +34,8 @@ export async function POST(req: Request) {
       args: [email, hashedPassword],
     });
 
-    return NextResponse.json(
-      {
-        success: true,
-        message: "Compte créé avec succès !",
-      },
-      { status: 201 },
-    );
+    return NextResponse.json({ success: true, message: "Compte créé !" });
   } catch (error: any) {
-    console.error("Erreur Register détaillée:", error.message || error);
-
-    return NextResponse.json(
-      {
-        error: "Erreur serveur lors de l'inscription.",
-        details: error.message,
-      },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
