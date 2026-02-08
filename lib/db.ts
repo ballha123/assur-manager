@@ -1,10 +1,14 @@
-import { createClient } from "@libsql/client"; // ✅ CORRECTION : On utilise le client standard (pas /web)
+import { createClient } from "@libsql/client/http"; // 👈 SOLUTION ULTIME : On force le mode HTTP
 
 const url = process.env.TURSO_DATABASE_URL;
 const authToken = process.env.TURSO_AUTH_TOKEN;
 
-// Protection pour le build
-const finalUrl = url || "https://placeholder-db.turso.io";
+// Protection pour le build et conversion automatique en HTTPS
+// Le client HTTP exige https://, on remplace libsql:// si présent
+const finalUrl = url
+  ? url.replace("libsql://", "https://")
+  : "https://placeholder-db.turso.io";
+
 const finalToken = authToken || "token-placeholder";
 
 if (!url) {
